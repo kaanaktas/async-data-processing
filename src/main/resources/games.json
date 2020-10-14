@@ -1,0 +1,18 @@
+{
+  "games": {
+    "game": [
+      {
+        "id": "1",
+        "name": "Flying Sweets"
+      },
+      {
+        "id": "2",
+        "name": "Circus Builder"
+      },
+      {
+        "id": "3",
+        "name": "Zoom Racer"
+      }
+    ]
+  }
+}

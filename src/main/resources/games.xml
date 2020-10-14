@@ -1,0 +1,16 @@
+<games>
+    <game>
+        <id>1</id>
+        <name>Flying Sweets</name>
+    </game>
+    <game>
+        <id>2</id>
+        <name>Circus Builder</name>
+    </game>
+    <game>
+        <id>3</id>
+        <name>Zoom Racer</name>
+    </game>
+</games>
+
+
