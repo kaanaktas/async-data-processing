@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class StreamManagerIT {
 
     private static final String inputDirectory = "documents/data-processing-v3-java/input";
-    private static final String outputDirectory = "documents/data-processing-v3-java/output";
+    private static final String outputDirectory = "documents/data-processing-v3-java/test.output";
 
     StreamManager streamManager;
 

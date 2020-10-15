@@ -44,7 +44,7 @@ public class QueueProducer implements Runnable {
                             futures.add(CompletableFuture.runAsync(() -> processInputFile(path), Executor.executor)));
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
-            System.exit(1);
+            Executor.executor.shutdown();
         }
 
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
@@ -58,7 +58,6 @@ public class QueueProducer implements Runnable {
                     }
                 }, Executor.executor)
                 .thenRun(() -> Executor.executor.shutdown()).join();
-
     }
 
     private void processInputFile(Path file) {

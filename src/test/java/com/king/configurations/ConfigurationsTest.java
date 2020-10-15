@@ -9,16 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Created by kaktas on 14/10/2020
  */
-class ConfigurationsTest {
+public class ConfigurationsTest {
 
     @Test
-    void getGameProperties() {
+    public void getGameProperties() {
         Map<String, String> result = Configurations.getGames();
         assertTrue(result.size() > 0);
     }
 
     @Test
-    void getEvents() {
+    public void getEvents() {
         Map<String, String> result = Configurations.getEvents();
         assertTrue(result.size() > 0);
     }
