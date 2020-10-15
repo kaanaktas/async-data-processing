@@ -1,16 +1,19 @@
 package com.king.producer;
 
+import com.king.configurations.Executor;
 import com.king.constant.Constants;
 import com.king.model.Event;
-import com.king.properties.PropertiesMap;
+import com.king.configurations.Configurations;
 import com.king.utils.EventFilter;
 import com.king.utils.Utils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -34,19 +37,28 @@ public class QueueProducer implements Runnable {
 
     @Override
     public void run() {
+        List<CompletableFuture<Void>> futures = new ArrayList<>();
         try (Stream<Path> paths = Files.walk(Objects.requireNonNull(Paths.get(inputDirectory)))) {
-            paths.filter(Files::isRegularFile).forEach(this::processInputFile);
+            paths.filter(Files::isRegularFile)
+                    .forEach(path ->
+                            futures.add(CompletableFuture.runAsync(() -> processInputFile(path), Executor.executor)));
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
             System.exit(1);
-        } finally {
-            try {
-                queue.put(new Event());
-            } catch (InterruptedException e) {
-                log.severe(e.getMessage());
-                Thread.currentThread().interrupt();
-            }
         }
+
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new))
+                .thenRunAsync(() -> {
+                    try {
+                        log.info("Queue marker is being added to queue to stop consumers.");
+                        queue.put(new Event());
+                    } catch (InterruptedException e) {
+                        log.severe(e.getMessage());
+                        Thread.currentThread().interrupt();
+                    }
+                }, Executor.executor)
+                .thenRun(() -> Executor.executor.shutdown()).join();
+
     }
 
     private void processInputFile(Path file) {
@@ -56,7 +68,7 @@ public class QueueProducer implements Runnable {
             stream.forEach(event -> {
                 try {
                     log.info("New event is arrived:" + event);
-                    Thread.sleep(100);
+                    Thread.sleep(Configurations.producerDelay());
                     if (isEventValid(event)) {
                         log.info("Event is valid, putting into the queue.");
                         queue.put(createEvent(event));
@@ -83,7 +95,7 @@ public class QueueProducer implements Runnable {
             return false;
 
         //event name check
-        String eventPattern = PropertiesMap.getEvents().get(eventArray[0]);
+        String eventPattern = Configurations.getEvents().get(eventArray[0]);
         if (eventPattern == null || eventPattern.isBlank())
             return false;
 
@@ -93,7 +105,7 @@ public class QueueProducer implements Runnable {
         }
 
         //check if the game exists
-        if (PropertiesMap.getGames().get(eventArray[2]) == null) {
+        if (Configurations.getGames().get(eventArray[2]) == null) {
             return false;
         }
 

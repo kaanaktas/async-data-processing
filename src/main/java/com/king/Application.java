@@ -25,7 +25,7 @@ public class Application {
 
         Path outputPath = Paths.get(outputDirectory);
         if (Files.exists(outputPath)) {
-            throw new DirectoryNotEmptyException(outputDirectory + " already exists!");
+          //  throw new DirectoryNotEmptyException(outputDirectory + " already exists!");
         } else{
             Files.createDirectories(outputPath);
         }

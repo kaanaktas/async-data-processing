@@ -1,5 +1,6 @@
 package com.king.consumer;
 
+import com.king.configurations.Configurations;
 import com.king.model.Event;
 import com.king.utils.Utils;
 
@@ -29,7 +30,7 @@ public class QueueConsumer implements Runnable {
             Event event;
 
             while ((event = queue.take()).getEventName() != null) {
-                Thread.sleep(100);
+                Thread.sleep(Configurations.consumerDelay());
                 log.info("Consumed " + event.toString());
                 convertEvent(event);
             }

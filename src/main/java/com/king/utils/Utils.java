@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  */
 public class Utils {
 
-    private static final Logger log = Logger.getLogger(Thread.currentThread().getContextClassLoader().getClass().getName());
+    private static final Logger log = Logger.getLogger(Utils.class.getName());
     private static final byte[] HEX_ARRAY = "0123456789abcdef".getBytes(StandardCharsets.US_ASCII);
 
     private Utils() {
