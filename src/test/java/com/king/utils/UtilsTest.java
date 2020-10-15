@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,5 +22,12 @@ class UtilsTest {
         Utils.writeToFile("test_file", "testdata");
         assertTrue(Files.exists(path));
         Files.delete(path);
+    }
+
+    @Test
+    void hashData() throws NoSuchAlgorithmException {
+        String clearText = "jane";
+        String result = Utils.hashData(clearText);
+        assertEquals("81F8F6DDE88365F3928796EC7AA53F72820B06DB8664F5FE76A7EB13E24546A2", result);
     }
 }

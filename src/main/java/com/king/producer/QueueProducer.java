@@ -1,5 +1,10 @@
 package com.king.producer;
 
+import com.king.constant.Constants;
+import com.king.model.Event;
+import com.king.properties.PropertiesMap;
+import com.king.utils.EventFilter;
+import com.king.utils.Utils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,14 +21,15 @@ import java.util.stream.Stream;
 public class QueueProducer implements Runnable {
 
     private static final Logger log = Logger.getLogger(QueueProducer.class.getName());
-    private static final String DELIMETER = "|";
 
     private final String inputDirectory;
-    private BlockingQueue<String> queue;
+    private final String outputDirectory;
+    private final BlockingQueue<Event> queue;
 
-    public QueueProducer(final BlockingQueue<String> queue, final String inputDirectory) {
+    public QueueProducer(final BlockingQueue<Event> queue, final String inputDirectory, final String outputDirectory) {
         this.queue = queue;
         this.inputDirectory = inputDirectory;
+        this.outputDirectory = outputDirectory;
     }
 
     @Override
@@ -32,6 +38,14 @@ public class QueueProducer implements Runnable {
             paths.filter(Files::isRegularFile).forEach(this::processInputFile);
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
+            System.exit(1);
+        } finally {
+            try {
+                queue.put(new Event());
+            } catch (InterruptedException e) {
+                log.severe(e.getMessage());
+                Thread.currentThread().interrupt();
+            }
         }
     }
 
@@ -39,61 +53,64 @@ public class QueueProducer implements Runnable {
         log.info("Reading file : " + file.toString());
 
         try (Stream<String> stream = Files.lines(Paths.get(file.toString()))) {
-            stream.forEach(message -> {
+            stream.forEach(event -> {
                 try {
-                    log.info("New message is arrived:" + message);
-                    Thread.sleep(1000);
+                    log.info("New event is arrived:" + event);
+                    Thread.sleep(100);
+                    if (isEventValid(event)) {
+                        log.info("Event is valid, putting into the queue.");
+                        queue.put(createEvent(event));
+                    } else {
+                        log.info("Event is not valid. It will be written to " + Constants.INVALID_LOG_FILE_NAME);
+                        Utils.writeToFile(outputDirectory + "/" + Constants.INVALID_LOG_FILE_NAME, (event + "\n"));
+                    }
 
-                    queue.put(message);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | IOException e) {
                     log.severe(e.getMessage());
+                    Thread.currentThread().interrupt();
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            log.log(Level.SEVERE, e.getMessage(), e);
         }
     }
 
-    private boolean isEventValid(String message) {
-        String[] partialMessage = message.split(DELIMETER);
+    private boolean isEventValid(String event) {
+        String[] eventArray = event.split(Constants.EVENT_DELIMITER);
 
-        if (partialMessage.length != 4 && partialMessage.length != 5) {
+        //null-check for event items
+        if (EventFilter.isNull(eventArray))
+            return false;
+
+        //event name check
+        String eventPattern = PropertiesMap.getEvents().get(eventArray[0]);
+        if (eventPattern == null || eventPattern.isBlank())
+            return false;
+
+        //check event against its pattern
+        if (!EventFilter.isPatternMatched(eventArray, eventPattern.split(Constants.EVENT_DELIMITER))) {
             return false;
         }
 
-        if (isNull(partialMessage))
-            return false;
-
-        if (isNotNumeric(partialMessage[2], partialMessage[partialMessage.length - 1])) {
+        //check if the game exists
+        if (PropertiesMap.getGames().get(eventArray[2]) == null) {
             return false;
         }
 
         return true;
     }
 
-    private boolean isNull(String... inputs) {
-        for (String input : inputs) {
-            if (input == null || "".equals(input)) {
-                return true;
-            }
-        }
-        return false;
-    }
+    private Event createEvent(String event) {
+        String[] eventArray = event.split(Constants.EVENT_DELIMITER);
 
-    public static boolean isNotNumeric(String... numerics) {
-        for (String numeric : numerics) {
-            try {
-                Double.parseDouble(numeric);
-            } catch (NumberFormatException e) {
-                return false;
-            }
-        }
+        Event eventObj = new Event();
+        eventObj.setEventName(eventArray[0]);
+        eventObj.setUserId(eventArray[1]);
+        eventObj.setGameId(eventArray[2]);
+        if (eventArray.length == 5)
+            eventObj.setProductDescription(eventArray[3]);
+        eventObj.setInstallationDateTime(eventArray[eventArray.length - 1]);
 
-        return true;
-    }
-
-    private boolean isValidDate(String date) {
-
-        return true;
+        return eventObj;
     }
 }

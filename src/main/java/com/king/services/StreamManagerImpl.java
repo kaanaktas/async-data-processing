@@ -1,10 +1,11 @@
 package com.king.services;
 
 import com.king.consumer.QueueConsumer;
+import com.king.model.Event;
 import com.king.producer.QueueProducer;
 
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.logging.Logger;
 
 /**
@@ -18,9 +19,9 @@ public class StreamManagerImpl implements StreamManager {
     private final QueueConsumer queueConsumer;
 
     public StreamManagerImpl(String inputDirectory, String outputDirectory) {
-        BlockingQueue<String> queue = new ArrayBlockingQueue<>(1024);
+        BlockingQueue<Event> queue = new LinkedBlockingDeque<>();
 
-        queueProducer = new QueueProducer(queue, inputDirectory);
+        queueProducer = new QueueProducer(queue, inputDirectory, outputDirectory);
         queueConsumer = new QueueConsumer(queue, outputDirectory);
     }
 
