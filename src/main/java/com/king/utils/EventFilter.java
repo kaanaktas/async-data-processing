@@ -16,7 +16,7 @@ public class EventFilter {
     public static boolean isPatternMatched(String[] eventArray, String[] patternArray) {
         if (eventArray.length == patternArray.length) {
             for (int i = 0; i < eventArray.length; i++) {
-                if ("numeric".equals(patternArray[i]) && !isNumeric(eventArray[i])) {
+                if ("numeric".equalsIgnoreCase(patternArray[i]) && !isNumeric(eventArray[i])) {
                     log.warning(String.format("Numeric part of the Event hasn't been matched with the pattern. Value:%s. Expected type:%s",
                             eventArray[i], patternArray[i]));
                     return false;
