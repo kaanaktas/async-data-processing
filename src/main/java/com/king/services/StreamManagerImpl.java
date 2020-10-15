@@ -1,5 +1,6 @@
 package com.king.services;
 
+import com.king.configurations.Executor;
 import com.king.consumer.QueueConsumer;
 import com.king.model.Event;
 import com.king.producer.QueueProducer;
@@ -27,8 +28,9 @@ public class StreamManagerImpl implements StreamManager {
 
     @Override
     public void manageStream() {
-        new Thread(queueProducer).start();
-        new Thread(queueConsumer).start();
+        Executor.executor.execute(queueProducer);
+        Executor.executor.execute(queueConsumer);
+
         log.info("Data streaming has been started...");
     }
 }
