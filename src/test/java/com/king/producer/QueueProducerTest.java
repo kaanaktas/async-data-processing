@@ -45,8 +45,8 @@ class QueueProducerTest {
         }
 
         List<String> invalidRecords = TestsUtils.getRecordsFromFile(outputFullPath);
-        assertEquals(3, invalidRecords.size());
-        assertEquals(2, counter);
+        assertEquals(14, invalidRecords.size());
+        assertEquals(11, counter);
     }
 
     @Test
