@@ -5,6 +5,7 @@
 .classpath
 .project
 target/
+output/
 
 documents/
 json_output/
@@ -14,20 +15,15 @@ test-outout/
 
 .vscode/
 
-target/
-
 ### STS ###
 .apt_generated
-.classpath
 .factorypath
-.project
 .settings
 .springBeans
 
 ### IntelliJ IDEA ###
 .idea
 *.iws
-*.iml
 *.ipr
 
 ### NetBeans ###

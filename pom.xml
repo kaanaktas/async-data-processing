@@ -4,11 +4,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.king</groupId>
-    <artifactId>king-data-processing</artifactId>
+    <groupId>com.async</groupId>
+    <artifactId>async-data-processing</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-    <description>King Data Processing Project</description>
+    <description>Async Data Processing Project</description>
 
     <properties>
         <java.version>11</java.version>
@@ -116,7 +116,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>com.king.Application</mainClass>
+                                    <mainClass>com.async.Application</mainClass>
                                 </manifest>
                             </archive>
                         </configuration>
