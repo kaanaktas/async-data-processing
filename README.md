@@ -47,12 +47,12 @@ Purchase Date Time (Number)
 
 There are three main actors in the application which are `Producer`, `Consumer` and `StreamManager`.
 
-* QueueProducer is producing events and adding them to the queue. QueueProducer executes input files asynchronously via CompletableFuture as per thread per file.
+* Producer is producing events and adding them to the queue. Producer executes input files asynchronously via CompletableFuture as per thread per file.
 So, multiple threads might be putting events to the queue. It validates all event through `EventFilter` and as per result it either creates an Event Object or puts the
 event to the InvalidEvent.log file.
-* QueueConsumer retrieves and removes the events from the queue, waits for the marker event to stop consuming the queue. QueueConsumer categories the events based on 
+* Consumer retrieves and removes the events from the queue, waits for the marker event to stop consuming the queue. Consumer categories the events based on 
 `Event Name` as per cvs file named with Event Name.
-* StreamManager executes the QueueProducer and QueueConsumer via ExecutorService.
+* StreamManager executes the Producer and Consumer via ExecutorService.
 
 ![Blocking Queue](images/blocking-deque.png)
 
